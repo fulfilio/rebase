@@ -68,6 +68,11 @@ set -o xtrace
 
 # make sure branches are up-to-date
 git fetch origin $BASE_BRANCH
+echo "Fetching Fork"
+git remote -v
+
+git fetch fork -v
+
 git fetch fork $HEAD_BRANCH
 
 # do the rebase
