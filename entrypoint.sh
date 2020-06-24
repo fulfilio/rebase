@@ -43,12 +43,6 @@ if [[ "$USER_EMAIL" == "null" ]]; then
 	USER_EMAIL="$USER_LOGIN@users.noreply.github.com"
 fi
 
-if [[ "$(echo "$pr_resp" | jq -r .rebaseable)" != "true" ]]; then
-	echo "GitHub doesn't think that the PR is rebaseable!"
-	echo "API response: $pr_resp"
-	exit 1
-fi
-
 if [[ -z "$BASE_BRANCH" ]]; then
 	echo "Cannot get base branch information for PR #$PR_NUMBER!"
 	echo "API response: $pr_resp"
@@ -79,6 +73,11 @@ git fetch fork $HEAD_BRANCH
 # do the rebase
 git checkout -b $HEAD_BRANCH fork/$HEAD_BRANCH
 git rebase origin/$BASE_BRANCH
+
+if [[ $(git diff --stat) != '' ]]; then
+  echo "Auto rebase failed"
+  exit 1
+fi
 
 # push back
 git push --force-with-lease fork $HEAD_BRANCH
